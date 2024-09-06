@@ -1,6 +1,6 @@
-package card.onboarding.model;
+package card.application.common.constants;
 
-import card.onboarding.exception.UnknownIdentityVerificationException;
+import card.application.common.exception.UnknownIdentityVerificationException;
 
 public enum IdentityVerificationStatus {
     IDENTITY_VERIFIED(0),

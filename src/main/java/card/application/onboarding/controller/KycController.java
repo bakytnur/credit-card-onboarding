@@ -1,7 +1,7 @@
 package card.application.onboarding.controller;
 
 import card.application.onboarding.service.KycService;
-import card.onboarding.model.IdentityVerificationStatus;
+import card.application.common.constants.IdentityVerificationStatus;
 import card.onboarding.model.request.IdentityVerificationRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

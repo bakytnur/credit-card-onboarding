@@ -1,12 +1,13 @@
 package card.application.orchestration.controller;
 
+import card.application.common.constants.IdentityVerificationStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/orchestration")
 public class OrchestrationController {
     @PostMapping("/aml")
-    public card.onboarding.model.IdentityVerificationStatus verifyIdentity() {
-        return card.onboarding.model.IdentityVerificationStatus.IDENTITY_VERIFIED;
+    public IdentityVerificationStatus verifyIdentity() {
+        return IdentityVerificationStatus.IDENTITY_VERIFIED;
     }
 }
