@@ -1,7 +1,7 @@
 package card.application.onboarding.entity;
 
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Builder
+@NoArgsConstructor
 @Table(name = "card_user")
 public class CardUser {
     @Id
@@ -51,5 +51,9 @@ public class CardUser {
     @PreUpdate
     protected void onUpdate() {
         lastModifiedDate = LocalDateTime.now();
+    }
+
+    public CardUser(int status) {
+        this.status = status;
     }
 }
