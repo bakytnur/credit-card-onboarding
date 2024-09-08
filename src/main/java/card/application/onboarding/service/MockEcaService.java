@@ -42,9 +42,9 @@ public class MockEcaService {
         wireMockServer.stop();
     }
 
-    public EcaResponse testGetExternalData(String emiratesId, String fullName) throws IOException, InterruptedException {
+    public EcaResponse getMockUserIdentity(String emiratesId, String fullName) throws IOException, InterruptedException {
         EcaRequest ecaRequest = new EcaRequest(emiratesId, fullName);
-        EcaResponse ecaResponse = new EcaResponse(true, "2025/11/01");
+        EcaResponse ecaResponse = new EcaResponse(true, "2025-11-01");
         String body = mapper.writeValueAsString(ecaResponse);
         // Stub the endpoint with WireMock
         WireMock.stubFor(WireMock.post(WireMock.urlEqualTo("/api/data"))

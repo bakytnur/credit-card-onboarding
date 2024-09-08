@@ -1,11 +1,10 @@
 package card.application.onboarding.repository;
 
+import card.application.onboarding.entity.CardUser;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-public class KycRepository {
-
-    public void storeKycResponse(String emiratesId, String fullName, boolean valid, String expiryDate) {
-
-    }
+public interface KycRepository extends JpaRepository<CardUser, Long> {
+    CardUser save(CardUser cardUser);
 }
