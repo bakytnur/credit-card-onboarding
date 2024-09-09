@@ -32,7 +32,7 @@ public class MockRiskEvaluationService {
     }
 
     @SneakyThrows
-    public int evaluateRisk(RiskEvaluationRequest request) {
+    public double evaluateRisk(RiskEvaluationRequest request) {
         var response = new RiskEvaluationResponse(request.getEmiratesId(), 100);
         String body = mapper.writeValueAsString(response);
         // Stub the endpoint with WireMock

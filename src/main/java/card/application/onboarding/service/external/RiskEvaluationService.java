@@ -23,7 +23,7 @@ public class RiskEvaluationService {
     }
 
     @SneakyThrows
-    public int evaluateRisk(RiskEvaluationRequest riskEvaluationRequest) {
+    public double evaluateRisk(RiskEvaluationRequest riskEvaluationRequest) {
         // Serialize EcaRequest object to JSON string
         String requestBody = mapper.writeValueAsString(riskEvaluationRequest);
 

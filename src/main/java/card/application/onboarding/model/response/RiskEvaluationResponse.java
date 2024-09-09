@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @Data
 public class RiskEvaluationResponse {
     String emiratesId;
-    int evaluationScore;
+    double evaluationScore;
 }

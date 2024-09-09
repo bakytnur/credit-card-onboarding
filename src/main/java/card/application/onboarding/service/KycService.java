@@ -49,6 +49,15 @@ public class KycService {
         kycResponse.setStatus(IDENTITY_VERIFIED.getState());
         kycResponse.setTotalScore(IDENTITY_VERIFICATION_SCORE);
 
+        evaluateKycScore(request, kycResponse);
+
+        cardUser.setScore(kycResponse.getTotalScore());
+        cardUser.setStatus(kycResponse.getStatus());
+        identityService.saveUserIdentity(cardUser);
+        return kycResponse;
+    }
+
+    private void evaluateKycScore(KycRequest request, KycResponse kycResponse) {
         // Run the employment verification in a separate thread
         CompletableFuture<Boolean> employmentCheckFuture = CompletableFuture.supplyAsync(() -> {
                     var employmentRequest = new EmploymentRequest(request.getEmiratesId(),
@@ -69,7 +78,7 @@ public class KycService {
         );
 
         // Run the risk evaluation in a separate thread
-        CompletableFuture<Integer> riskEvaluationFuture = CompletableFuture.supplyAsync(() -> {
+        CompletableFuture<Double> riskEvaluationFuture = CompletableFuture.supplyAsync(() -> {
                 var riskEvaluationRequest = new RiskEvaluationRequest(request.getEmiratesId(),
                         request.getFullName());
                 return riskEvaluationService.evaluateRisk(riskEvaluationRequest);
@@ -83,34 +92,33 @@ public class KycService {
                         // Get the results of all futures
                         boolean employmentCheck = employmentCheckFuture.get();
                         boolean complianceCheck = complianceCheckFuture.get();
-                        int riskEvaluation = riskEvaluationFuture.get();
-                        if (employmentCheck) {
-                            kycResponse.setTotalScore(kycResponse.getTotalScore() + EMPLOYMENT_VERIFICATION_SCORE);
-                            kycResponse.setStatus(kycResponse.getStatus() | EMPLOYMENT_VERIFIED.getState());
-                        }
-
-                        if (complianceCheck) {
-                            kycResponse.setTotalScore(kycResponse.getTotalScore() + COMPLIANCE_CHECK_SCORE);
-                            kycResponse.setStatus(kycResponse.getStatus() | COMPLIANCE_CHECKED.getState());
-                        }
-
-                        // is risk evaluated
-                        assert riskEvaluation >= 0 && riskEvaluation <= 100;
-
-                        kycResponse.setTotalScore(kycResponse.getTotalScore() + weightedScore(riskEvaluation));
-                        kycResponse.setStatus(kycResponse.getStatus() | RISK_EVALUATED.getState());
+                        double riskEvaluation = riskEvaluationFuture.get();
+                        setKycScoreAndStatus(kycResponse, employmentCheck, complianceCheck, riskEvaluation);
                     } catch (Exception e) {
                         throw new RuntimeException("Error processing identity", e);
                     }
                 }).join();
-
-        cardUser.setScore(kycResponse.getTotalScore());
-        cardUser.setStatus(kycResponse.getStatus());
-        identityService.saveUserIdentity(cardUser);
-        return kycResponse;
     }
 
-    private int weightedScore(int value) {
-        return (value * RISK_EVALUATION_MAX_SCORE) / 100;
+    private void setKycScoreAndStatus(KycResponse kycResponse, boolean employmentCheck, boolean complianceCheck, double riskEvaluation) {
+        if (employmentCheck) {
+            kycResponse.setTotalScore(kycResponse.getTotalScore() + EMPLOYMENT_VERIFICATION_SCORE);
+            kycResponse.setStatus(kycResponse.getStatus() | EMPLOYMENT_VERIFIED.getState());
+        }
+
+        if (complianceCheck) {
+            kycResponse.setTotalScore(kycResponse.getTotalScore() + COMPLIANCE_CHECK_SCORE);
+            kycResponse.setStatus(kycResponse.getStatus() | COMPLIANCE_CHECKED.getState());
+        }
+
+        // is risk evaluated
+        assert riskEvaluation >= 0 && riskEvaluation <= 100;
+
+        kycResponse.setTotalScore(kycResponse.getTotalScore() + weightedScore(riskEvaluation));
+        kycResponse.setStatus(kycResponse.getStatus() | RISK_EVALUATED.getState());
+    }
+
+    private int weightedScore(double value) {
+        return (int) (value * RISK_EVALUATION_MAX_SCORE / (double )100);
     }
 }
