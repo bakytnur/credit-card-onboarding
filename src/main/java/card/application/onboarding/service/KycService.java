@@ -1,7 +1,6 @@
 package card.application.onboarding.service;
 
 import card.application.common.Helper;
-import card.application.common.constants.VerificationStatus;
 import card.application.onboarding.model.request.ComplianceCheckRequest;
 import card.application.onboarding.model.request.EmploymentRequest;
 import card.application.onboarding.model.request.KycRequest;
@@ -41,12 +40,13 @@ public class KycService {
         var kycResponse = new KycResponse();
         if (cardUser == null) {
             kycResponse.setTotalScore(0);
-            kycResponse.setStatus(VerificationStatus.IDENTITY_UNKNOWN.getState());
+            kycResponse.setStatus(IDENTITY_UNKNOWN.getState());
             return kycResponse;
         }
 
         // set initial score and state
-        kycResponse.setStatus(VerificationStatus.IDENTITY_VERIFIED.getState());
+        kycResponse.setEmiratesId(request.getEmiratesId());
+        kycResponse.setStatus(IDENTITY_VERIFIED.getState());
         kycResponse.setTotalScore(IDENTITY_VERIFICATION_SCORE);
 
         // Run the employment verification in a separate thread
@@ -102,7 +102,7 @@ public class KycService {
                     } catch (Exception e) {
                         throw new RuntimeException("Error processing identity", e);
                     }
-                });
+                }).join();
 
         cardUser.setScore(kycResponse.getTotalScore());
         cardUser.setStatus(kycResponse.getStatus());

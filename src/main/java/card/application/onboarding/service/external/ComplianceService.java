@@ -4,25 +4,22 @@ import card.application.onboarding.model.request.ComplianceCheckRequest;
 import card.application.onboarding.model.response.ComplianceCheckResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-@Service
 public class ComplianceService {
     private final HttpClient httpClient;
     private final ObjectMapper mapper;
-    @Value("{compliance.evaluation.base.url}")
-    private String baseUrl;
+    private final String baseUrl;
 
-    public ComplianceService(HttpClient httpClient, ObjectMapper mapper) {
+    public ComplianceService(HttpClient httpClient, ObjectMapper mapper, String baseUrl) {
         this.httpClient = httpClient;
         this.mapper = mapper;
+        this.baseUrl = baseUrl;
     }
 
     @SneakyThrows

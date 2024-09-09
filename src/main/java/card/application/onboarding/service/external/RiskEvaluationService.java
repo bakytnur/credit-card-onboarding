@@ -4,25 +4,22 @@ import card.application.onboarding.model.request.RiskEvaluationRequest;
 import card.application.onboarding.model.response.RiskEvaluationResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Service;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-@Service
 public class RiskEvaluationService {
     private final HttpClient httpClient;
     private final ObjectMapper mapper;
-    @Value("{risk.evaluation.base.url}")
-    private String baseUrl;
+    private final String baseUrl;
 
-    public RiskEvaluationService(HttpClient httpClient, ObjectMapper mapper) {
+    public RiskEvaluationService(HttpClient httpClient, ObjectMapper mapper, String baseUrl) {
         this.httpClient = httpClient;
         this.mapper = mapper;
+        this.baseUrl = baseUrl;
     }
 
     @SneakyThrows

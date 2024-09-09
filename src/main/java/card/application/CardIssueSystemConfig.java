@@ -14,7 +14,6 @@ public class CardIssueSystemConfig {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("card.application.onboarding.controller"))
-      //          .apis(RequestHandlerSelectors.basePackage("card.application.orchestration.controller"))
                 .paths(PathSelectors.any())
                 .build();
     }

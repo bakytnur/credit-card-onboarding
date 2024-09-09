@@ -7,39 +7,28 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import java.net.http.HttpClient;
-
-import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 
 @Service
 public class MockEcaService {
+    @Autowired
     private WireMockServer wireMockServer;
     private EcaService externalService;
     private static final ObjectMapper mapper = new ObjectMapper();
 
     @PostConstruct
     void setUp() {
-        // Start WireMock server on a random port
-        wireMockServer = new WireMockServer(options().dynamicPort());
-        wireMockServer.start();
-
-        // Configure WireMock to use this instance
-        WireMock.configureFor(wireMockServer.port());
+        // Reset mappings before each test
+        wireMockServer.resetAll();
 
         // Initialize your ExternalService with the WireMock base URL
         HttpClient httpClient = HttpClient.newHttpClient();
         // eca
-        externalService = new EcaService(httpClient, mapper);
-    }
-
-    @PreDestroy
-    void tearDown() {
-        // Stop the WireMock server after each test
-        wireMockServer.stop();
+        externalService = new EcaService(httpClient, mapper, "http://localhost:" + wireMockServer.port());
     }
 
     @SneakyThrows
@@ -47,7 +36,7 @@ public class MockEcaService {
         var ecaResponse = new EcaResponse(true, "2025-11-01");
         String body = mapper.writeValueAsString(ecaResponse);
         // Stub the endpoint with WireMock
-        WireMock.stubFor(WireMock.post(WireMock.urlEqualTo("/api/data"))
+        wireMockServer.stubFor(WireMock.post(WireMock.urlEqualTo("/api/eca"))
                 .willReturn(WireMock.aResponse()
                         .withStatus(200)
                         .withBody(body)

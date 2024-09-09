@@ -4,7 +4,6 @@ import card.application.onboarding.model.request.EcaRequest;
 import card.application.onboarding.model.response.EcaResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 
 import java.net.URI;
@@ -16,12 +15,12 @@ public class EcaService {
 
     private final HttpClient httpClient;
     private final ObjectMapper mapper;
-    @Value("{eca.base.url}")
-    private String baseUrl;
+    private final String baseUrl;
 
-    public EcaService(HttpClient httpClient, ObjectMapper mapper) {
+    public EcaService(HttpClient httpClient, ObjectMapper mapper, String baseUrl) {
         this.httpClient = httpClient;
         this.mapper = mapper;
+        this.baseUrl = baseUrl;
     }
 
     @SneakyThrows

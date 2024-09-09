@@ -34,7 +34,7 @@ public class CardUser {
     private int status;
 
     // credit score
-    @Column(name = "score")
+    @Column(name = "score", columnDefinition = "int default 0")
     private int score;
 
     @Column(name = "expiry_date")
