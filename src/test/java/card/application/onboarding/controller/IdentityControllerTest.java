@@ -2,8 +2,8 @@ package card.application.onboarding.controller;
 
 import card.application.common.constants.VerificationStatus;
 import card.application.common.exception.InputValidationException;
+import card.application.onboarding.model.request.IdentityVerificationRequest;
 import card.application.onboarding.service.IdentityService;
-import card.onboarding.model.request.IdentityVerificationRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

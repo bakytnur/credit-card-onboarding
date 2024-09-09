@@ -1,4 +1,4 @@
-package card.application.onboarding.model;
+package card.application.onboarding.model.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

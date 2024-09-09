@@ -29,8 +29,13 @@ public class CardUser {
     @Column(name = "emirates_id", unique = true, nullable = false, length = 15)
     private String emiratesId;
 
+    // combination of statuses
     @Column(name = "status")
     private int status;
+
+    // credit score
+    @Column(name = "score")
+    private int score;
 
     @Column(name = "expiry_date")
     private LocalDate expiryDate;

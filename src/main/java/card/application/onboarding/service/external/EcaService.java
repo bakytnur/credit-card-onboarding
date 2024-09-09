@@ -1,7 +1,7 @@
-package card.application.onboarding.service;
+package card.application.onboarding.service.external;
 
-import card.application.onboarding.model.EcaRequest;
-import card.application.onboarding.model.EcaResponse;
+import card.application.onboarding.model.request.EcaRequest;
+import card.application.onboarding.model.response.EcaResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -10,7 +10,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
-class EcaService {
+public class EcaService {
 
     private final HttpClient httpClient;
     private final ObjectMapper mapper;

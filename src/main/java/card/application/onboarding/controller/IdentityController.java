@@ -1,8 +1,8 @@
 package card.application.onboarding.controller;
 
 import card.application.common.constants.VerificationStatus;
+import card.application.onboarding.model.request.IdentityVerificationRequest;
 import card.application.onboarding.service.IdentityService;
-import card.onboarding.model.request.IdentityVerificationRequest;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

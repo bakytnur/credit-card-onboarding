@@ -1,7 +1,8 @@
-package card.application.onboarding.service;
+package card.application.onboarding.service.mock;
 
-import card.application.onboarding.model.EcaRequest;
-import card.application.onboarding.model.EcaResponse;
+import card.application.onboarding.model.request.EcaRequest;
+import card.application.onboarding.model.response.EcaResponse;
+import card.application.onboarding.service.external.EcaService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
