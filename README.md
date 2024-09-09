@@ -80,6 +80,64 @@ The `KycController` class exposes a REST API for performing KYC checks:
         - **Response**: `KycResponse`
         - **Description**: Performs KYC checks, including employment verification, compliance checks, and risk evaluation. Returns the KYC response.
 
+## Entities
+
+### `CardUser`
+
+Represents a user in the card onboarding system. It includes fields for:
+- `id`: The unique identifier of the user.
+- `name`: The name of the user.
+- `emiratesId`: The Emirates ID of the user (unique and mandatory).
+- `status`: A combination of statuses. (The result of the bitwise OR operation)
+- `score`: The credit score of the user (default is 0).
+- `expiryDate`: The expiry date of the Emirates ID.
+- `lastModifiedDate`: The date when the user information was last modified.
+- `createdOn`: The date when the user information was created.
+
+## Enum: `VerificationStatus`
+
+The `VerificationStatus` enum represents various states of user verification and checks. It is used to track and manage the status of different verification processes within the application. Each status is associated with an integer value that helps in flagging and querying the state of a user's verification process.
+
+### Enum Constants
+
+- **`IDENTITY_UNKNOWN` (0)**: Indicates that the identity of the user is unknown or unverified.
+- **`IDENTITY_VERIFIED` (1)**: Indicates that the user's identity has been successfully verified.
+- **`COMPLIANCE_CHECKED` (2)**: Indicates that a compliance check has been performed on the user.
+- **`EMPLOYMENT_VERIFIED` (4)**: Indicates that the user's employment status has been verified.
+- **`RISK_EVALUATED` (8)**: Indicates that a risk evaluation has been completed for the user.
+- **`BEHAVIORAL_ANALYSIS_CHECKED` (16)**: Indicates that a behavioral analysis check has been performed on the user.
+
+### Final User Status
+
+The final user status is a combination of multiple `VerificationStatus` values. These statuses are combined using bitwise `OR` operations to represent a comprehensive view of the user's verification state. For example:
+
+- If a user has passed identity verification, employment verification, and risk evaluation, the combined status might be represented as `IDENTITY_VERIFIED | EMPLOYMENT_VERIFIED | RISK_EVALUATED`, which corresponds to the integer value `1 | 4 | 8 = 13`.
+
+This bitwise approach allows for flexible and scalable management of multiple verification statuses, where each status is represented as a unique bit in an integer value.
+
+### Usage
+
+The `VerificationStatus` enum is used to manage and check the status of various verification processes in the system. The combination of statuses can be managed through bitwise operations to handle cases where multiple verification steps need to be tracked simultaneously.
+
+Example usage:
+
+```java
+int combinedStatus = VerificationStatus.IDENTITY_VERIFIED.getState()
+        | VerificationStatus.EMPLOYMENT_VERIFIED.getState()
+        | VerificationStatus.RISK_EVALUATED.getState();
+
+if ((combinedStatus & VerificationStatus.IDENTITY_VERIFIED.getState()) != 0) {
+        // Identity verification has been completed
+        }
+
+        if ((combinedStatus & VerificationStatus.EMPLOYMENT_VERIFIED.getState()) != 0) {
+        // Employment verification has been completed
+        }
+
+        if ((combinedStatus & VerificationStatus.RISK_EVALUATED.getState()) != 0) {
+        // Risk evaluation has been completed
+        }
+```        
 # Constants
 
 - **IDENTITY_VERIFICATION_SCORE**: The base score for identity verification.

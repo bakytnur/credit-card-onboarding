@@ -8,7 +8,7 @@ import card.application.onboarding.model.request.VerificationRequest;
 
 public class Helper {
     public static boolean isUserVerifiedForStatus(CardUser user, VerificationStatus status) {
-        return (user.getStatus() & status.getState()) == status.getState();
+        return (user.getStatus() & status.getState()) != 0;
     }
 
     public static void validateRequest(VerificationRequest request) {
