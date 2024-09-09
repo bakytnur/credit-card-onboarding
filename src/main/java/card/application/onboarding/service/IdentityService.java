@@ -32,24 +32,20 @@ public class IdentityService {
         // Validation
         Helper.validateRequest(request);
 
-        try {
-            // check from the DB for an existing user
-            var existingUser = getExistingIdentityForUser(request);
-            if (existingUser != null) return VerificationStatus.IDENTITY_VERIFIED;
+        // check from the DB for an existing user
+        var existingUser = getExistingIdentityForUser(request);
+        if (existingUser != null) return VerificationStatus.IDENTITY_VERIFIED;
 
-            // if not found in DB or with expired EID, call ECA API
-            EcaResponse response = mockEcaService.getMockUserIdentity(request.getEmiratesId(), request.getFullName());
-            VerificationStatus status = response.isValid()
-                    ? VerificationStatus.IDENTITY_VERIFIED : VerificationStatus.IDENTITY_UNKNOWN;
-            // store the ECA response
-            CardUser user = buildCardUser(request.getEmiratesId(), request.getFullName(),
-                    status, response.getExpiryDate());
+        // if not found in DB or with expired EID, call ECA API
+        var response = mockEcaService.getMockUserIdentity(request.getEmiratesId(), request.getFullName());
+        var status = response.isValid()
+                ? VerificationStatus.IDENTITY_VERIFIED : VerificationStatus.IDENTITY_UNKNOWN;
+        // store the ECA response
+        var user = buildCardUser(request.getEmiratesId(), request.getFullName(),
+                status, response.getExpiryDate());
 
-            saveUserIdentity(user);
-            return status;
-        } catch (IOException | InterruptedException e) {
-            throw new RuntimeException(e.getMessage(), e.getCause());
-        }
+        saveUserIdentity(user);
+        return status;
     }
 
     public void saveUserIdentity(CardUser user) {
@@ -63,7 +59,7 @@ public class IdentityService {
             return null;
         }
 
-        CardUser user = existingUser.get();
+        var user = existingUser.get();
         if (isUserVerifiedForStatus(user, VerificationStatus.IDENTITY_VERIFIED)
                 // check EID validity
                 && user.getExpiryDate().isAfter(LocalDate.now())) {
@@ -73,7 +69,7 @@ public class IdentityService {
     }
 
     private CardUser buildCardUser(String emiratesId, String fullName, VerificationStatus status, String expiryDate) {
-        CardUser cardUser = new CardUser();
+        var cardUser = new CardUser();
         cardUser.setName(fullName);
         cardUser.setEmiratesId(emiratesId);
         cardUser.setStatus(status.getState());

@@ -107,12 +107,4 @@ public class IdentityServiceTest {
         assertEquals(VerificationStatus.IDENTITY_UNKNOWN, status);
         verify(identityRepository, times(1)).save(any(CardUser.class));
     }
-
-    @Test
-    void testVerifyIdentity_withIOException() throws IOException, InterruptedException {
-        when(identityRepository.findByEmiratesId(anyString())).thenReturn(Optional.empty());
-        when(mockEcaService.getMockUserIdentity(anyString(), anyString())).thenThrow(new IOException());
-
-        assertThrows(RuntimeException.class, () -> identityService.verifyIdentity(request));
-    }
 }

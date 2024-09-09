@@ -2,6 +2,8 @@ package card.application.onboarding.service;
 
 import card.application.common.Helper;
 import card.application.common.constants.VerificationStatus;
+import card.application.onboarding.model.request.ComplianceCheckRequest;
+import card.application.onboarding.model.request.EmploymentRequest;
 import card.application.onboarding.model.request.KycRequest;
 import card.application.onboarding.model.response.KycResponse;
 import card.application.onboarding.service.external.ComplianceService;
@@ -9,6 +11,7 @@ import card.application.onboarding.service.external.EmploymentVerificationServic
 import card.application.onboarding.service.external.RiskEvaluationService;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
 import static card.application.common.constants.Constants.*;
@@ -35,7 +38,7 @@ public class KycService {
         Helper.validateRequest(request);
         // Check identity verification complete
         var cardUser = identityService.getExistingIdentityForUser(request);
-        KycResponse kycResponse = new KycResponse();
+        var kycResponse = new KycResponse();
         if (cardUser == null) {
             kycResponse.setTotalScore(0);
             kycResponse.setStatus(VerificationStatus.IDENTITY_UNKNOWN.getState());
@@ -47,13 +50,17 @@ public class KycService {
         kycResponse.setTotalScore(IDENTITY_VERIFICATION_SCORE);
 
         // Run the employment verification in a separate thread
-        CompletableFuture<Boolean> employmentCheckFuture = CompletableFuture.supplyAsync(() ->
-                employmentVerificationService.verifyEmployment(request)
+        CompletableFuture<Boolean> employmentCheckFuture = CompletableFuture.supplyAsync(() -> {
+                    var employmentRequest = new EmploymentRequest();
+                    return employmentVerificationService.verifyEmployment(employmentRequest);
+                }
         );
 
         // Run the compliance check in a separate thread
-        CompletableFuture<Boolean> complianceCheckFuture = CompletableFuture.supplyAsync(() ->
-                complianceService.performComplianceCheck(request)
+        CompletableFuture<Boolean> complianceCheckFuture = CompletableFuture.supplyAsync(() -> {
+                    var complianceCheckRequest = new ComplianceCheckRequest();
+                    return complianceService.performComplianceCheck(complianceCheckRequest);
+                }
         );
 
         // Run the risk evaluation in a separate thread

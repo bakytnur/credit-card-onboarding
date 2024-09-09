@@ -6,6 +6,7 @@ import card.application.onboarding.service.external.EcaService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -34,7 +35,7 @@ public class MockEcaService {
         // Initialize your ExternalService with the WireMock base URL
         HttpClient httpClient = HttpClient.newHttpClient();
         // eca
-        externalService = new EcaService(httpClient, mapper, "http://localhost:" + wireMockServer.port());
+        externalService = new EcaService(httpClient, mapper);
     }
 
     @PreDestroy
@@ -43,9 +44,10 @@ public class MockEcaService {
         wireMockServer.stop();
     }
 
-    public EcaResponse getMockUserIdentity(String emiratesId, String fullName) throws IOException, InterruptedException {
-        EcaRequest ecaRequest = new EcaRequest(emiratesId, fullName);
-        EcaResponse ecaResponse = new EcaResponse(true, "2025-11-01");
+    @SneakyThrows
+    public EcaResponse getMockUserIdentity(String emiratesId, String fullName) {
+        var ecaRequest = new EcaRequest(emiratesId, fullName);
+        var ecaResponse = new EcaResponse(true, "2025-11-01");
         String body = mapper.writeValueAsString(ecaResponse);
         // Stub the endpoint with WireMock
         WireMock.stubFor(WireMock.post(WireMock.urlEqualTo("/api/data"))
