@@ -1,8 +1,8 @@
 package card.application.onboarding.service.mock;
 
-import card.application.onboarding.model.request.EcaRequest;
-import card.application.onboarding.model.response.EcaResponse;
-import card.application.onboarding.service.external.EcaService;
+import card.application.onboarding.model.request.RiskEvaluationRequest;
+import card.application.onboarding.model.response.RiskEvaluationResponse;
+import card.application.onboarding.service.external.RiskEvaluationService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -16,9 +16,10 @@ import java.net.http.HttpClient;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 
 @Service
-public class MockEcaService {
+public class MockRiskEvaluationService {
+
     private WireMockServer wireMockServer;
-    private EcaService externalService;
+    private RiskEvaluationService riskEvaluationService;
     private static final ObjectMapper mapper = new ObjectMapper();
 
     @PostConstruct
@@ -32,8 +33,8 @@ public class MockEcaService {
 
         // Initialize your ExternalService with the WireMock base URL
         HttpClient httpClient = HttpClient.newHttpClient();
-        // eca
-        externalService = new EcaService(httpClient, mapper);
+        // risk evaluation service
+        riskEvaluationService = new RiskEvaluationService(httpClient, mapper);
     }
 
     @PreDestroy
@@ -43,17 +44,17 @@ public class MockEcaService {
     }
 
     @SneakyThrows
-    public EcaResponse verifyUserIdentity(EcaRequest request) {
-        var ecaResponse = new EcaResponse(true, "2025-11-01");
-        String body = mapper.writeValueAsString(ecaResponse);
+    public int evaluateRisk(RiskEvaluationRequest request) {
+        var response = new RiskEvaluationResponse(request.getEmiratesId(), 100);
+        String body = mapper.writeValueAsString(response);
         // Stub the endpoint with WireMock
-        WireMock.stubFor(WireMock.post(WireMock.urlEqualTo("/api/data"))
+        WireMock.stubFor(WireMock.post(WireMock.urlEqualTo("/api/risk/evaluation"))
                 .willReturn(WireMock.aResponse()
                         .withStatus(200)
                         .withBody(body)
                         .withHeader("Content-Type", "application/json")));
 
         // Call the method that uses the HTTP client
-        return externalService.verifyUserIdentity(request);
+        return riskEvaluationService.evaluateRisk(request);
     }
 }

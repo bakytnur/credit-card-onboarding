@@ -1,9 +1,7 @@
 package card.application.onboarding.service.external;
 
 import card.application.onboarding.model.request.ComplianceCheckRequest;
-import card.application.onboarding.model.request.EmploymentRequest;
 import card.application.onboarding.model.response.ComplianceCheckResponse;
-import card.application.onboarding.model.response.EmploymentResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,7 +32,7 @@ public class ComplianceService {
 
         // Create a POST request with JSON body
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/api/data"))
+                .uri(URI.create(baseUrl + "/api/compliance"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
@@ -43,8 +41,8 @@ public class ComplianceService {
             return false;
         }
 
-        if (response.statusCode() == 200) {
-            ComplianceCheckResponse res = mapper.readValue(response.body(), ComplianceCheckResponse.class);
+        if (response.statusCode() == HttpStatus.OK.value()) {
+            var res = mapper.readValue(response.body(), ComplianceCheckResponse.class);
             // TODO: store compliance status
             return res.isCompliancePassed();
         }

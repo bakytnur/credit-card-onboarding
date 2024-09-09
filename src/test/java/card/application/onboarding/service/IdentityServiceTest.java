@@ -3,6 +3,7 @@ package card.application.onboarding.service;
 import card.application.common.constants.VerificationStatus;
 import card.application.common.exception.InputValidationException;
 import card.application.onboarding.entity.CardUser;
+import card.application.onboarding.model.request.EcaRequest;
 import card.application.onboarding.model.request.IdentityVerificationRequest;
 import card.application.onboarding.model.response.EcaResponse;
 import card.application.onboarding.repository.IdentityRepository;
@@ -21,6 +22,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -57,7 +59,7 @@ public class IdentityServiceTest {
         VerificationStatus status = identityService.verifyIdentity(request);
 
         assertEquals(VerificationStatus.IDENTITY_VERIFIED, status);
-        verify(mockEcaService, never()).getMockUserIdentity(anyString(), anyString());
+        verify(mockEcaService, never()).verifyUserIdentity(any(EcaRequest.class));
     }
 
     @SneakyThrows
@@ -66,7 +68,7 @@ public class IdentityServiceTest {
         request.setEmiratesId("invalid-emirates-id");
 
         assertThrows(InputValidationException.class, () -> identityService.verifyIdentity(request));
-        verify(mockEcaService, never()).getMockUserIdentity(anyString(), anyString());
+        verify(mockEcaService, never()).verifyUserIdentity(any(EcaRequest.class));
     }
 
     @SneakyThrows
@@ -75,7 +77,7 @@ public class IdentityServiceTest {
         request.setFullName("Invalid Name!@#");
 
         assertThrows(InputValidationException.class, () -> identityService.verifyIdentity(request));
-        verify(mockEcaService, never()).getMockUserIdentity(anyString(), anyString());
+        verify(mockEcaService, never()).verifyUserIdentity(any(EcaRequest.class));
     }
 
     @Test
@@ -85,7 +87,7 @@ public class IdentityServiceTest {
         ecaResponse.setExpiryDate("2024-09-07");
 
         when(identityRepository.findByEmiratesId(anyString())).thenReturn(Optional.empty());
-        when(mockEcaService.getMockUserIdentity(anyString(), anyString())).thenReturn(ecaResponse);
+        when(mockEcaService.verifyUserIdentity(any(EcaRequest.class))).thenReturn(ecaResponse);
 
         VerificationStatus status = identityService.verifyIdentity(request);
 
@@ -100,7 +102,7 @@ public class IdentityServiceTest {
         ecaResponse.setExpiryDate("2024-09-09");
 
         when(identityRepository.findByEmiratesId(anyString())).thenReturn(Optional.empty());
-        when(mockEcaService.getMockUserIdentity(anyString(), anyString())).thenReturn(ecaResponse);
+        when(mockEcaService.verifyUserIdentity(any(EcaRequest.class))).thenReturn(ecaResponse);
 
         VerificationStatus status = identityService.verifyIdentity(request);
 

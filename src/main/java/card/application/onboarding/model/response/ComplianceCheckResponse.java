@@ -1,9 +1,9 @@
 package card.application.onboarding.model.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.time.LocalDate;
-
+@AllArgsConstructor
 @Data
 public class ComplianceCheckResponse {
     String emiratesId;

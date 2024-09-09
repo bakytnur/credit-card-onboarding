@@ -5,9 +5,7 @@ import lombok.Data;
 
 @AllArgsConstructor
 @Data
-public class EmploymentResponse {
+public class RiskEvaluationResponse {
     String emiratesId;
-    String employmentId;
-    boolean isEmployed;
-    String employmentDate;
+    int evaluationScore;
 }

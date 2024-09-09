@@ -1,8 +1,8 @@
 package card.application.onboarding.service.mock;
 
-import card.application.onboarding.model.request.EcaRequest;
-import card.application.onboarding.model.response.EcaResponse;
-import card.application.onboarding.service.external.EcaService;
+import card.application.onboarding.model.request.ComplianceCheckRequest;
+import card.application.onboarding.model.response.ComplianceCheckResponse;
+import card.application.onboarding.service.external.ComplianceService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
@@ -16,9 +16,10 @@ import java.net.http.HttpClient;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.options;
 
 @Service
-public class MockEcaService {
+public class MockComplianceService {
+
     private WireMockServer wireMockServer;
-    private EcaService externalService;
+    private ComplianceService externalService;
     private static final ObjectMapper mapper = new ObjectMapper();
 
     @PostConstruct
@@ -32,8 +33,8 @@ public class MockEcaService {
 
         // Initialize your ExternalService with the WireMock base URL
         HttpClient httpClient = HttpClient.newHttpClient();
-        // eca
-        externalService = new EcaService(httpClient, mapper);
+        // complianceService
+        externalService = new ComplianceService(httpClient, mapper);
     }
 
     @PreDestroy
@@ -43,17 +44,17 @@ public class MockEcaService {
     }
 
     @SneakyThrows
-    public EcaResponse verifyUserIdentity(EcaRequest request) {
-        var ecaResponse = new EcaResponse(true, "2025-11-01");
-        String body = mapper.writeValueAsString(ecaResponse);
+    public boolean performComplianceCheck(ComplianceCheckRequest request) {
+        var response = new ComplianceCheckResponse(request.getEmiratesId(), true);
+        String body = mapper.writeValueAsString(response);
         // Stub the endpoint with WireMock
-        WireMock.stubFor(WireMock.post(WireMock.urlEqualTo("/api/data"))
+        WireMock.stubFor(WireMock.post(WireMock.urlEqualTo("/api/compliance"))
                 .willReturn(WireMock.aResponse()
                         .withStatus(200)
                         .withBody(body)
                         .withHeader("Content-Type", "application/json")));
 
         // Call the method that uses the HTTP client
-        return externalService.verifyUserIdentity(request);
+        return externalService.performComplianceCheck(request);
     }
 }

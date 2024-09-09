@@ -1,9 +1,6 @@
 package card.application.onboarding.service.external;
 
-import card.application.onboarding.model.request.EcaRequest;
 import card.application.onboarding.model.request.EmploymentRequest;
-import card.application.onboarding.model.request.KycRequest;
-import card.application.onboarding.model.response.EcaResponse;
 import card.application.onboarding.model.response.EmploymentResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -11,8 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import javax.validation.Valid;
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -37,7 +32,7 @@ public class EmploymentVerificationService {
 
         // Create a POST request with JSON body
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/api/data"))
+                .uri(URI.create(baseUrl + "/api/employment"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
@@ -46,8 +41,8 @@ public class EmploymentVerificationService {
             return false;
         }
 
-        if (response.statusCode() == 200) {
-            EmploymentResponse res = mapper.readValue(response.body(), EmploymentResponse.class);
+        if (response.statusCode() == HttpStatus.OK.value()) {
+            var res = mapper.readValue(response.body(), EmploymentResponse.class);
             // TODO: store employment status
             return res.isEmployed();
         }

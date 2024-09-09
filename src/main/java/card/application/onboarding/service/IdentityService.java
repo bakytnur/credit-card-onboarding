@@ -3,15 +3,14 @@ package card.application.onboarding.service;
 import card.application.common.Helper;
 import card.application.common.constants.VerificationStatus;
 import card.application.onboarding.entity.CardUser;
+import card.application.onboarding.model.request.EcaRequest;
 import card.application.onboarding.model.request.VerificationRequest;
-import card.application.onboarding.model.response.EcaResponse;
 import card.application.onboarding.repository.IdentityRepository;
 import card.application.onboarding.service.mock.MockEcaService;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -37,7 +36,7 @@ public class IdentityService {
         if (existingUser != null) return VerificationStatus.IDENTITY_VERIFIED;
 
         // if not found in DB or with expired EID, call ECA API
-        var response = mockEcaService.getMockUserIdentity(request.getEmiratesId(), request.getFullName());
+        var response = mockEcaService.verifyUserIdentity(new EcaRequest(request.getEmiratesId(), request.getFullName()));
         var status = response.isValid()
                 ? VerificationStatus.IDENTITY_VERIFIED : VerificationStatus.IDENTITY_UNKNOWN;
         // store the ECA response

@@ -9,4 +9,5 @@ public class KycRequest implements VerificationRequest {
 
     private String mobileNumber;
     private String employerId;
+    private String nationality;
 }

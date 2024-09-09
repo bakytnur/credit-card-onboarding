@@ -7,7 +7,6 @@ import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -32,7 +31,7 @@ public class EcaService {
 
         // Create a POST request with JSON body
         var request = HttpRequest.newBuilder()
-                .uri(URI.create(baseUrl + "/api/data"))
+                .uri(URI.create(baseUrl + "/api/eca"))
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(requestBody))
                 .build();
@@ -42,7 +41,7 @@ public class EcaService {
             return null;
         }
 
-        if (response.statusCode() == 200) {
+        if (response.statusCode() == HttpStatus.OK.value()) {
             return mapper.readValue(response.body(), EcaResponse.class);
         }
 

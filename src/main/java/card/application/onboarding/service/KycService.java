@@ -5,13 +5,13 @@ import card.application.common.constants.VerificationStatus;
 import card.application.onboarding.model.request.ComplianceCheckRequest;
 import card.application.onboarding.model.request.EmploymentRequest;
 import card.application.onboarding.model.request.KycRequest;
+import card.application.onboarding.model.request.RiskEvaluationRequest;
 import card.application.onboarding.model.response.KycResponse;
-import card.application.onboarding.service.external.ComplianceService;
-import card.application.onboarding.service.external.EmploymentVerificationService;
-import card.application.onboarding.service.external.RiskEvaluationService;
+import card.application.onboarding.service.mock.MockComplianceService;
+import card.application.onboarding.service.mock.MockEmploymentVerificationService;
+import card.application.onboarding.service.mock.MockRiskEvaluationService;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 
 import static card.application.common.constants.Constants.*;
@@ -19,14 +19,14 @@ import static card.application.common.constants.VerificationStatus.*;
 
 @Service
 public class KycService {
-    private final EmploymentVerificationService employmentVerificationService;
-    private final ComplianceService complianceService;
-    private final RiskEvaluationService riskEvaluationService;
+    private final MockEmploymentVerificationService employmentVerificationService;
+    private final MockComplianceService complianceService;
+    private final MockRiskEvaluationService riskEvaluationService;
     private final IdentityService identityService;
 
-    public KycService(EmploymentVerificationService employmentVerificationService,
-                      ComplianceService complianceService,
-                      RiskEvaluationService riskEvaluationService,
+    public KycService(MockEmploymentVerificationService employmentVerificationService,
+                      MockComplianceService complianceService,
+                      MockRiskEvaluationService riskEvaluationService,
                       IdentityService identityService) {
         this.employmentVerificationService = employmentVerificationService;
         this.complianceService = complianceService;
@@ -51,21 +51,29 @@ public class KycService {
 
         // Run the employment verification in a separate thread
         CompletableFuture<Boolean> employmentCheckFuture = CompletableFuture.supplyAsync(() -> {
-                    var employmentRequest = new EmploymentRequest();
+                    var employmentRequest = new EmploymentRequest(request.getEmiratesId(),
+                            request.getFullName(),
+                            request.getEmployerId());
                     return employmentVerificationService.verifyEmployment(employmentRequest);
                 }
         );
 
         // Run the compliance check in a separate thread
         CompletableFuture<Boolean> complianceCheckFuture = CompletableFuture.supplyAsync(() -> {
-                    var complianceCheckRequest = new ComplianceCheckRequest();
+                    var complianceCheckRequest = new ComplianceCheckRequest(request.getEmiratesId(),
+                            request.getFullName(),
+                            request.getMobileNumber(),
+                            request.getNationality());
                     return complianceService.performComplianceCheck(complianceCheckRequest);
                 }
         );
 
         // Run the risk evaluation in a separate thread
-        CompletableFuture<Integer> riskEvaluationFuture = CompletableFuture.supplyAsync(() ->
-                riskEvaluationService.evaluateRisk(request)
+        CompletableFuture<Integer> riskEvaluationFuture = CompletableFuture.supplyAsync(() -> {
+                var riskEvaluationRequest = new RiskEvaluationRequest(request.getEmiratesId(),
+                        request.getFullName());
+                return riskEvaluationService.evaluateRisk(riskEvaluationRequest);
+                }
         );
 
         // Combine the results of all three futures
@@ -87,10 +95,10 @@ public class KycService {
                         }
 
                         // is risk evaluated
-                        if (riskEvaluation > 0) {
-                            kycResponse.setTotalScore(kycResponse.getTotalScore() + RISK_EVALUATED.getState());
-                            kycResponse.setStatus(kycResponse.getStatus() | RISK_EVALUATED.getState());
-                        }
+                        assert riskEvaluation >= 0 && riskEvaluation <= 100;
+
+                        kycResponse.setTotalScore(kycResponse.getTotalScore() + weightedScore(riskEvaluation));
+                        kycResponse.setStatus(kycResponse.getStatus() | RISK_EVALUATED.getState());
                     } catch (Exception e) {
                         throw new RuntimeException("Error processing identity", e);
                     }
@@ -100,5 +108,9 @@ public class KycService {
         cardUser.setStatus(kycResponse.getStatus());
         identityService.saveUserIdentity(cardUser);
         return kycResponse;
+    }
+
+    private int weightedScore(int value) {
+        return (value * RISK_EVALUATION_MAX_SCORE) / 100;
     }
 }
